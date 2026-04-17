@@ -1,0 +1,21 @@
+name: Hanna-pipeline
+on: workflow_dispatch
+
+jobs:
+  build-jobs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v6
+        with:
+          ref: main
+      - name: get pem file
+        run: |
+          echo "${{secrets.secret_key}}" > Hanna_key.pem
+          chmod 400 Hanna_key.pem
+      - name: cp app.py
+        run: scp -o StrictHostKeyChecking=no -i Hanna_key.pem app.py ec2-user@65.2.149.144:/home/ec2-user/
+      - name: cp req.txt
+        run: scp -o StrictHostKeyChecking=no -i Hanna_key.pem requirements.txt ec2-user@65.2.149.144:/home/ec2-user/ 
+      - name: run app
+        run: ssh -o StrictHostKeyChecking=no -i Hanna_key.pem ec2-user@65.2.149.144 "cd /home/ec2-user && python3 -m venv venv && source venv/bin/activate && pip3 install -r requirements.txt && python3 app.py"
