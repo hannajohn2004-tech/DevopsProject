@@ -18,16 +18,16 @@ jobs:
 
       - name: Copy project files to EC2
         run: |
-          scp -o StrictHostKeyChecking=no -i Hanna_key.pem app.py ec2-user@43.205.114.136:/home/ec2-user/
-          scp -o StrictHostKeyChecking=no -i Hanna_key.pem requirements.txt ec2-user@43.205.114.136:/home/ec2-user/
-          scp -o StrictHostKeyChecking=no -i Hanna_key.pem Dockerfile ec2-user@43.205.114.136:/home/ec2-user/
-          scp -o StrictHostKeyChecking=no -i Hanna_key.pem visitors.txt ec2-user@43.205.114.136:/home/ec2-user/
+          scp -o StrictHostKeyChecking=no -i Hanna_key.pem app.py ec2-user@34.229.167.101:/home/ec2-user/
+          scp -o StrictHostKeyChecking=no -i Hanna_key.pem requirements.txt ec2-user@34.229.167.101:/home/ec2-user/
+          scp -o StrictHostKeyChecking=no -i Hanna_key.pem Dockerfile ec2-user@34.229.167.101:/home/ec2-user/
+          scp -o StrictHostKeyChecking=no -i Hanna_key.pem visitors.txt ec2-user@34.229.167.101:/home/ec2-user/
 
       - name: Build & Run Docker on EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i Hanna_key.pem ec2-user@43.205.114.136 "
+          ssh -o StrictHostKeyChecking=no -i Hanna_key.pem ec2-user@34.229.167.101 "
           sudo docker stop portfolio-app || true &&
           sudo docker rm portfolio-app || true &&
           sudo docker build -t portfolio-app /home/ec2-user &&
-          sudo docker run -d -p 5000:5000 --name portfolio-app portfolio-app
+          sudo docker run -d -p 5001:5001 --name portfolio-app portfolio-app
           "
