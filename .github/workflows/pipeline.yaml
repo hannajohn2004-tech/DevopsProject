@@ -1,21 +1,33 @@
 name: Hanna-pipeline
-on: workflow_dispatch
+
+on:
+  workflow_dispatch
 
 jobs:
   build-jobs:
     runs-on: ubuntu-latest
+
     steps:
-      - name: checkout code
-        uses: actions/checkout@v6
-        with:
-          ref: main
-      - name: get pem file
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create PEM file
         run: |
-          echo "${{secrets.secret_key}}" > Hanna_key.pem
+          echo "${{ secrets.secret_key }}" > Hanna_key.pem
           chmod 400 Hanna_key.pem
-      - name: cp app.py
-        run: scp -o StrictHostKeyChecking=no -i Hanna_key.pem app.py ec2-user@43.205.114.136:/home/ec2-user/
-      - name: cp req.txt
-        run: scp -o StrictHostKeyChecking=no -i Hanna_key.pem requirements.txt ec2-user@43.205.114.136:/home/ec2-user/ 
-      - name: run app
-        run: ssh -o StrictHostKeyChecking=no -i Hanna_key.pem ec2-user@43.205.114.136 "cd /home/ec2-user && python3 -m venv venv && source venv/bin/activate && pip3 install -r requirements.txt && python3 app.py"
+
+      - name: Copy project files to EC2
+        run: |
+          scp -o StrictHostKeyChecking=no -i Hanna_key.pem app.py ec2-user@43.205.114.136:/home/ec2-user/
+          scp -o StrictHostKeyChecking=no -i Hanna_key.pem requirements.txt ec2-user@43.205.114.136:/home/ec2-user/
+          scp -o StrictHostKeyChecking=no -i Hanna_key.pem Dockerfile ec2-user@43.205.114.136:/home/ec2-user/
+          scp -o StrictHostKeyChecking=no -i Hanna_key.pem visitors.txt ec2-user@43.205.114.136:/home/ec2-user/
+
+      - name: Build & Run Docker on EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i Hanna_key.pem ec2-user@43.205.114.136 "
+          sudo docker stop portfolio-app || true &&
+          sudo docker rm portfolio-app || true &&
+          sudo docker build -t portfolio-app /home/ec2-user &&
+          sudo docker run -d -p 5000:5000 --name portfolio-app portfolio-app
+          "
