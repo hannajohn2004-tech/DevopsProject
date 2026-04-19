@@ -29,5 +29,5 @@ jobs:
           sudo docker stop portfolio-app || true &&
           sudo docker rm portfolio-app || true &&
           sudo docker build -t portfolio-app /home/ec2-user &&
-          sudo docker run -d -p 5001:5001 --name portfolio-app portfolio-app
+          sudo docker run -d -p 5002:5001 --name portfolio-app portfolio-app
           "
